@@ -9,7 +9,6 @@ class PostSerializer(serializers.ModelSerializer):
         slug_field='username',
         read_only=True
     )
-    image = serializers.ImageField(required=False)
 
     class Meta:
         fields = '__all__'
@@ -39,11 +38,12 @@ class CommentSerializer(serializers.ModelSerializer):
 
 class FollowSerializer(serializers.ModelSerializer):
     """Сериализатор для подписок."""
-    user = serializers.StringRelatedField(
-        default=serializers.CurrentUserDefault()
+    user = serializers.SlugRelatedField(
+        default=serializers.CurrentUserDefault(),
+        slug_field='username',
+        read_only=True
     )
     following = serializers.SlugRelatedField(
-        read_only=False,
         queryset=User.objects.all(),
         slug_field='username'
     )
