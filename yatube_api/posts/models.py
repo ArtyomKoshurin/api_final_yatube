@@ -1,6 +1,5 @@
 from django.contrib.auth import get_user_model
 from django.db import models
-from django.core.exceptions import ValidationError
 
 User = get_user_model()
 
@@ -59,18 +58,11 @@ class Follow(models.Model):
                 fields=['user', 'following'],
                 name='unique_user_following'
             ),
-            # Если у меня эта проверка находится на уровне сериализатора -
-            # все равно лучше в модели прописать?
-            # Пробовал таким способом, но не совсем получается, только
-            # clean-методом получилось:
-            # models.CheckConstraint(check=models.Q(
-            #                       user__exclude=following),
-            #                       name='user_not_following')
+            models.CheckConstraint(check=(
+                models.Q(user=models.F('following'))),
+                name='user_not_following'
+            )
         ]
-
-    def clean(self):
-        if self.user == self.following:
-            raise ValidationError('Нельзя подписаться на самого себя.')
 
     def __srt__(self):
         return f'{self.user} подписан на {self.following}'
